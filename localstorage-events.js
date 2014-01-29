@@ -126,6 +126,8 @@
 
   };
 
+  LSEvents.support = support;
+
   return LSEvents;
 
 }));
