@@ -104,8 +104,8 @@
       });
     },
 
-    // Ignore the event if it was originated by this window. Tell IE8 which `key` changed
-    // and grab it's `newValue`.
+    // Ignore the event if it originated in this window. Tell IE8 which `key` changed and
+    // grab it's `newValue`.
     _onStorage: function(evt) {
       var ref = (Cookie.get('version') || ':').split(':'),
           uid = ref[0], key = ref[1];
