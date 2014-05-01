@@ -1,0 +1,32 @@
+{
+  "name": "localstorage-events",
+  "main": "localstorage-events.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/chatid/localstorage-events",
+  "authors": [
+    "mponizil <misha.ponizil@gmail.com>"
+  ],
+  "description": "Thin wrapper for LocalStorage to make \"storage\" events in IE8+ consistent with modern browsers",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "LocalStorage",
+    "storage",
+    "storage",
+    "event",
+    "IE8"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "cookie.js": "git@github.com:mponizil/cookie.js.git"
+  }
+}
