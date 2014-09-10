@@ -17,27 +17,23 @@
     storageEventProvidesKey: !('onstorage' in document)
   };
 
-  // http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
-  support.has = function(object, property){
-    var t = typeof object[property];
-    return t == 'function' || (!!(t == 'object' && object[property])) || t == 'unknown';
-  }
-
-  if (support.has(window, 'addEventListener')) {
-    support.on = function(target, name, callback) {
-      target.addEventListener(name, callback, false);
+  var support = {
+    // http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
+    has: function(object, property){
+      var t = typeof object[property];
+      return t == 'function' || (!!(t == 'object' && object[property])) || t == 'unknown';
+    },
+    on: function(target, name, callback) {
+      support.has(window, 'addEventListener') ?
+        target.addEventListener(name, callback, false) :
+        target.attachEvent('on' + name, callback);
+    },
+    off: function(target, name, callback) {
+      support.has(window, 'removeEventListener') ?
+        target.removeEventListener(name, callback, false) :
+        target.detachEvent('on' + name, callback);
     }
-    support.off = function(target, name, callback) {
-      target.removeEventListener(name, callback, false);
-    }
-  } else if (support.has(window, 'attachEvent')) {
-    support.on = function(object, name, callback) {
-      object.attachEvent('on' + name, function() { callback(window.event) });
-    }
-    support.off = function(object, name, callback) {
-      object.detachEvent('on' + name, function() { callback(window.event) });
-    }
-  }
+  };
 
   var myUid = Math.floor(Math.random() * 1000) + '' + +new Date;
 
