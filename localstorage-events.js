@@ -56,7 +56,7 @@
 
   // If necessary, wrap some storage interface to properly trigger "storage" events in IE.
   var LSEvents = function(storage, onStorage) {
-    this.storage = storage || lsWrapper;
+    this.storage = this.storage || storage || lsWrapper;
 
     if (support.myWritesTrigger) {
       this.onStorage = onStorage;
