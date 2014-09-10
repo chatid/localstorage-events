@@ -12,12 +12,6 @@
 }(this, function(Cookie) {
 
   var support = {
-    myWritesTrigger: ('onstoragecommit' in document),
-    storageEventTarget: ('onstorage' in window ? window : document),
-    storageEventProvidesKey: !('onstorage' in document)
-  };
-
-  var support = {
     // http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
     has: function(object, property){
       var t = typeof object[property];
@@ -32,7 +26,10 @@
       support.has(window, 'removeEventListener') ?
         target.removeEventListener(name, callback, false) :
         target.detachEvent('on' + name, callback);
-    }
+    },
+    myWritesTrigger: ('onstoragecommit' in document),
+    storageEventTarget: ('onstorage' in window ? window : document),
+    storageEventProvidesKey: !('onstorage' in document)
   };
 
   var myUid = Math.floor(Math.random() * 1000) + '' + +new Date;
