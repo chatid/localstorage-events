@@ -27,6 +27,6 @@
     "tests"
   ],
   "dependencies": {
-    "cookie.js": "git@github.com:mponizil/cookie.js.git"
+    "cookie": "git@github.com:mponizil/cookie.js.git"
   }
 }

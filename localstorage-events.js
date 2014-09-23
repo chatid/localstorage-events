@@ -6,9 +6,9 @@
 */
 
 (function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define('localstorage-events', ['cookie'], factory);
-  } else root.LSEvents = factory(root.Cookie);
+  if (typeof define === 'function' && define.amd) define('localstorage-events', ['cookie'], factory);
+  else if (typeof exports === 'object') module.exports = factory(require('cookie'));
+  else root.LSEvents = factory(root.Cookie);
 }(this, function(Cookie) {
 
   var support = {
