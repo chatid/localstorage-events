@@ -34,88 +34,61 @@
 
   var myUid = Math.floor(Math.random() * 1000) + '' + +new Date;
 
-  // Wrap localStorage so it may be swapped out.
-  var lsWrapper = {
-    get: function(key) {
-      return localStorage.getItem(key);
-    },
-    set: function(key, value) {
-      return localStorage.setItem(key, value);
-    },
-    unset: function(keys) {
-      if (!(keys instanceof Array)) keys = [keys];
-      for (i = 0; i < keys.length; i++) localStorage.removeItem(keys[i]);
-    }
-  };
-
   // LSEvents
-  // -------------
+  // --------
 
-  // If necessary, wrap some storage interface to properly trigger "storage" events in IE.
-  var LSEvents = function(storage, onStorage) {
-    this.storage = this.storage || storage || lsWrapper;
+  // Decorate a LocalStorage interface to properly trigger "storage" events in IE.
+  var LSEvents = function(storageCtor) {
 
-    if (support.myWritesTrigger) {
-      this.onStorage = onStorage;
-      this.listen();
-    } else {
-      return this.storage;
-    }
-  };
+    if (!support.myWritesTrigger) return storageCtor;
 
-  LSEvents.prototype = {
+    return storageCtor.extend({
 
-    get: function() {
-      return this.storage.get.apply(this.storage, arguments);
-    },
+      // Before setting the value, set a version flag indicating that the last write came
+      // from this window and targeted the given key.
+      set: function(key) {
+        Cookie.set('version', myUid + ':' + key);
+        return storageCtor.prototype.set.apply(this, arguments);
+      },
 
-    // Before setting the value, set a version flag indicating that the last write came
-    // from this window and targeted the given key.
-    set: function(key) {
-      Cookie.set('version', myUid + ':' + key);
-      return this.storage.set.apply(this.storage, arguments);
-    },
+      listen: function() {
+        var storage = this, target = support.storageEventTarget;
+        support.on(target, 'storage', function(evt) {
+          // IE8: to accurately determine `evt.newValue`, we must read it during the event
+          // callback. Oddly, it returns the old value instead of the new one until the call
+          // stack clears. More oddly, I was unable to reproduce this with a minimal test
+          // case, yet it always seems to behave this way here.
+          if (!support.storageEventProvidesKey) {
+            setTimeout(function() {
+              storage._onStorage(evt);
+            }, 0);
+          } else {
+            storage._onStorage(evt);
+          }
+        });
+      },
 
-    unset: function() {
-      return this.storage.unset.apply(this.storage, arguments);
-    },
+      // Ignore the event if it originated in this window. Tell IE8 which `key` changed
+      // and grab it's `newValue`.
+      _onStorage: function(evt) {
+        var ref = (Cookie.get('version') || ':').split(':'),
+            uid = ref[0], key = ref[1];
 
-    listen: function() {
-      var self = this, target = support.storageEventTarget;
-      support.on(target, 'storage', function(evt) {
-        // IE8: to accurately determine `evt.newValue`, we must read it during the event
-        // callback. Oddly, it returns the old value instead of the new one until the call
-        // stack clears. More oddly, I was unable to reproduce this with a minimal test
-        // case, yet it always seems to behave this way here.
+        // For all IE
+        if (uid == myUid) return;
+
+        // For IE8
         if (!support.storageEventProvidesKey) {
-          setTimeout(function() {
-            self._onStorage(evt);
-          }, 0);
-        } else {
-          self._onStorage(evt);
+          evt = {
+            key: key,
+            newValue: localStorage.getItem(key)
+          };
         }
-      });
-    },
 
-    // Ignore the event if it originated in this window. Tell IE8 which `key` changed and
-    // grab it's `newValue`.
-    _onStorage: function(evt) {
-      var ref = (Cookie.get('version') || ':').split(':'),
-          uid = ref[0], key = ref[1];
-
-      // For all IE
-      if (uid == myUid) return;
-
-      // For IE8
-      if (!support.storageEventProvidesKey) {
-        evt = {
-          key: key,
-          newValue: this.storage.get(key)
-        };
+        this.onStorage(evt);
       }
 
-      this.onStorage(evt);
-    }
+    });
 
   };
 
