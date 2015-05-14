@@ -1,5 +1,26 @@
 {
-  "browserify": {
-    "transform": ["debowerify"]
+  "name": "localstorage-events",
+  "version": "0.0.1",
+  "description": "Thin wrapper for LocalStorage to make \"storage\" events in IE8+ consistent with modern browsers",
+  "main": "localstorage-events.js",
+  "scripts": {
+    "test": "karma start --single-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chatid/localstorage-events.git"
+  },
+  "author": "Misha Ponizil",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chatid/localstorage-events/issues"
+  },
+  "homepage": "https://github.com/chatid/localstorage-events",
+  "dependencies": {
+    "js-cookie": "^1.5.1"
+  },
+  "devDependencies": {
+    "node-libs-browser": "^0.5.0",
+    "webpack": "^1.9.5"
   }
 }
