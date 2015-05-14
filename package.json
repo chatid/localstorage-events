@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/chatid/localstorage-events",
   "dependencies": {
-    "js-cookie": "^1.5.1"
+    "js-cookie": "git://github.com/js-cookie/js-cookie.git#v2.0.0-beta.1"
   },
   "devDependencies": {
     "node-libs-browser": "^0.5.0",
