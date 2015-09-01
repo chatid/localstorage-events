@@ -1,5 +1,4 @@
 module.exports = {
-  devtool: 'source-map',
   entry: './localstorage-events',
   output: {
     path: __dirname + '/dist',
