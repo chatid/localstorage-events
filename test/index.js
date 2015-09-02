@@ -118,7 +118,7 @@ describe('LSEvents', function() {
   it('ignores "storage" events from this window', function(done) {
     var onStorage = sinon.stub();
     store = LSEvents(onStorage);
-    localStorage.setItem('foo', 'bar');
+    store.set('foo', 'bar');
     setTimeout(function() {
       sinon.assert.notCalled(onStorage);
       done();
