@@ -7,8 +7,8 @@ var LSInterface = require('./ls-interface');
 var support = require('../util/support');
 
 // "storage" events are fired async and with inconsistent timing
-// Use 30ms to be safe
-var TICK = 30;
+// IE9 is super prone to race conditions, so just use 500ms for IE
+var TICK = navigator.userAgent.indexOf('MSIE') >= 0 ? 500 : 17;
 
 describe('LSEvents', function() {
 
