@@ -50,7 +50,8 @@ describe('LSEvents', function() {
     });
 
     exec.code(function(exec, LSEvents) {
-      localStorage.setItem('foo', 'bar');
+      var store = LSEvents();
+      store.set('foo', 'bar');
     });
   });
 
