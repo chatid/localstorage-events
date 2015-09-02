@@ -5,6 +5,7 @@ var LSEvents = require('../localstorage-events');
 var LSWrapper = require('../util/ls-wrapper');
 var LSInterface = require('./ls-interface');
 var support = require('../util/support');
+var TICK = 17;
 
 describe('LSEvents', function() {
 
@@ -27,7 +28,7 @@ describe('LSEvents', function() {
     }, function() {
       // Prevent cleanup "storage" events from interfering with real tests (it seems that "storage"
       // events are dispatched async, so calling `done` from this callback is not sufficient)
-      setTimeout(done, 0);
+      setTimeout(done, TICK);
     });
   });
 
@@ -115,6 +116,16 @@ describe('LSEvents', function() {
     if (support.myWritesTrigger) {
       expect(store.__lsEventsDecorator.cookieName).to.be('test-cookie');
     }
+  });
+
+  it('ignores "storage" events from this window', function(done) {
+    var onStorage = sinon.stub();
+    store = LSEvents(onStorage);
+    localStorage.setItem('foo', 'bar');
+    setTimeout(function() {
+      sinon.assert.notCalled(onStorage);
+      done();
+    }, TICK);
   });
 
 });
