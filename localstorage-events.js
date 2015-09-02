@@ -14,6 +14,9 @@ var support = require('./util/support');
 var instanceId = Math.floor(Math.random() * 1000) + '' + +new Date;
 
 function LocalStorageEventListener(storage, onStorage) {
+  this.onStorage = onStorage;
+  this._onStorage = bind(this._onStorage, this);
+
   var destroy = storage.destroy;
   var decorator = this;
   storage.destroy = function() {
@@ -24,8 +27,6 @@ function LocalStorageEventListener(storage, onStorage) {
     }
   }
 
-  this.onStorage = onStorage;
-  this._onStorage = bind(this._onStorage, this);
   support.on(support.storageEventTarget, 'storage', this._onStorage);
 
   return storage;
@@ -39,13 +40,15 @@ LocalStorageEventListener.prototype = {
 
 };
 
-function LocalStorageEventNormalizer(storage, onStorage) {
+function LocalStorageEventNormalizer(storage, onStorage, cookieName) {
+  this.cookieName = cookieName;
+
   var set = storage.set;
   var destroy = storage.destroy;
   storage.set = function(key) {
     // Before setting the value, set a version flag indicating that the
     // last write came from this window and targeted the given key.
-    Cookies.set('version', instanceId + ':' + key);
+    Cookies.set(cookieName, instanceId + ':' + key);
     return set.apply(storage, arguments);
   }
   storage.destroy = function() {
@@ -78,7 +81,7 @@ LocalStorageEventNormalizer.prototype = {
   // Ignore the event if it originated in this window. Tell IE8 which `key` changed
   // and grab it's `newValue`.
   _processStorageEvt: function(evt) {
-    var ref = (Cookies.get('version') || ':').split(':'),
+    var ref = (Cookies.get(this.cookieName) || ':').split(':'),
         writerId = ref[0], key = ref[1];
 
     // For all IE
@@ -98,20 +101,28 @@ LocalStorageEventNormalizer.prototype = {
 };
 
 // Decorate a LocalStorage interface to properly trigger "storage" events in IE.
-var LSEvents = function(storage, onStorage) {
+var LSEvents = function(storage, onStorage, cookieName) {
 
+  // `storage` interface is optional
   if (typeof storage === 'function') {
+    cookieName = onStorage;
     onStorage = storage;
     storage = lsWrapper;
   }
 
+  // Sensible defaults for no args passed
   if (typeof storage === 'undefined') {
     storage = lsWrapper;
     onStorage = function(){};
   }
 
+  // Default value for cookieName
+  if (typeof cookieName !== 'string') {
+    cookieName = 'lsevents-version';
+  }
+
   if (support.myWritesTrigger) {
-    return new LocalStorageEventNormalizer(storage, onStorage);
+    return new LocalStorageEventNormalizer(storage, onStorage, cookieName);
   } else {
     return new LocalStorageEventListener(storage, onStorage);
   }
