@@ -8,7 +8,7 @@
 var Cookies = require('js-cookie');
 var assign = require('./util/assign');
 var bind = require('./util/bind');
-var lsWrapper = require('./util/ls-wrapper');
+var LSWrapper = require('./util/ls-wrapper');
 var support = require('./util/support');
 
 var instanceId = Math.floor(Math.random() * 1000) + '' + +new Date;
@@ -107,12 +107,12 @@ var LSEvents = function(storage, onStorage, cookieName) {
   if (typeof storage === 'function') {
     cookieName = onStorage;
     onStorage = storage;
-    storage = lsWrapper;
+    storage = LSWrapper;
   }
 
   // Sensible defaults for no args passed
   if (typeof storage === 'undefined') {
-    storage = lsWrapper;
+    storage = LSWrapper;
     onStorage = function(){};
   }
 
