@@ -48,8 +48,7 @@ describe('LSEvents', function() {
     });
 
     exec.code(function(exec, LSEvents) {
-      var store = LSEvents();
-      store.set('foo', 'bar');
+      localStorage.setItem('foo', 'bar');
     });
   });
 
