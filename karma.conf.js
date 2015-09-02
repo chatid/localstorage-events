@@ -2,10 +2,12 @@ var webpack = require('webpack');
 
 var webpackConfig = require('./webpack.config');
 
+var HOST = process.env.HOST || '127.0.0.1';
+
 webpackConfig.plugins = webpackConfig.plugins || [];
 webpackConfig.plugins.push(
   new webpack.DefinePlugin({
-    __HOST__: JSON.stringify('http://127.0.0.1'),
+    __HOST__: JSON.stringify('http://' + HOST),
     __PORT__: 9876
   })
 );
@@ -55,6 +57,7 @@ module.exports = function (config) {
       require('karma-webpack'),
       require('karma-mocha'),
       require('karma-phantomjs-launcher'),
+      require('karma-sauce-launcher'),
       // Need to use special packaged sinon cuz webpack has issues building it
       // https://github.com/webpack/webpack/issues/304
       require('karma-sinon')
@@ -70,7 +73,7 @@ module.exports = function (config) {
     // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
     reporters: ['progress'],
 
-    hostname: '127.0.0.1',
+    hostname: HOST,
 
     // web server port
     port: 9876,
