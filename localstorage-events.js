@@ -18,10 +18,25 @@ function LocalStorageEventListener(storage, onStorage) {
   this.onStorage = onStorage;
   this._onStorage = bind(this._onStorage, this);
   support.on(support.storageEventTarget, 'storage', this._onStorage);
-  return storage;
 }
 
 LocalStorageEventListener.prototype = {
+
+  get: function() {
+    return this.storage.get.apply(this, arguments);
+  },
+
+  set: function() {
+    return this.storage.set.apply(this, arguments);
+  },
+
+  unset: function() {
+    return this.storage.unset.apply(this, arguments);
+  },
+
+  destroy: function() {
+    support.off(support.storageEventTarget, 'storage', this._onStorage);
+  },
 
   _onStorage: function(evt) {
     this.onStorage(evt);
@@ -96,6 +111,11 @@ var LSEvents = function(storage, onStorage) {
   if (typeof storage === 'function') {
     onStorage = storage;
     storage = lsWrapper;
+  }
+
+  if (typeof storage === 'undefined') {
+    storage = lsWrapper;
+    onStorage = function(){};
   }
 
   if (support.myWritesTrigger) {

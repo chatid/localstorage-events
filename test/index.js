@@ -6,7 +6,7 @@ var lsWrapper = require('../util/ls-wrapper');
 
 describe('LSEvents', function() {
 
-  var manager, exec;
+  var manager, exec, store;
 
   before(function(done) {
     manager = ift.parent({
@@ -29,20 +29,25 @@ describe('LSEvents', function() {
     });
   });
 
+  afterEach(function() {
+    store.destroy();
+  });
+
   after(function() {
     manager.destroy();
   });
 
   it('calls onStorage callback on "storage" events', function(done) {
-    var store = LSEvents(function(evt) {
+    store = LSEvents(function(evt) {
       expect(evt.key).to.be('foo');
       expect(evt.oldValue).to.be(null);
       expect(evt.newValue).to.be('bar');
       done();
     });
 
-    exec.code(function() {
-      localStorage.setItem('foo', 'bar');
+    exec.code(function(exec, LSEvents) {
+      var store = LSEvents();
+      store.set('foo', 'bar');
     });
   });
 
