@@ -59,10 +59,14 @@ describe('LSEvents', function() {
       expect(evt.oldValue).to.be(null);
       expect(evt.newValue).to.be('test');
       done();
-    }, { storage: LSWrapper });
+    }, {
+      storage: LSWrapper
+    });
 
     exec.code(function(exec, LSEvents, LSWrapper, LSInterface) {
-      var store = LSEvents({ storage: LSWrapper });
+      var store = LSEvents({
+        storage: LSWrapper
+      });
       store.set('baz', 'test');
     });
   });
@@ -73,10 +77,14 @@ describe('LSEvents', function() {
       expect(store.deserialize(evt.oldValue)).to.be(null);
       expect(store.deserialize(evt.newValue)).to.be('test');
       done();
-    }, { storage: LSInterface });
+    }, {
+      storage: LSInterface
+    });
 
     exec.code(function(exec, LSEvents, LSInterface) {
-      var store = LSEvents({ storage: LSInterface });
+      var store = LSEvents({
+        storage: LSInterface
+      });
       store.set('baz', 'test');
     });
   });
