@@ -17,10 +17,14 @@ function LocalStorageEventListener(storage, onStorage) {
   this.onStorage = onStorage;
   this._onStorage = bind(this._onStorage, this);
 
+  // Expose private reverse reference to the decorator
+  storage.__lsEventsDecorator = this;
+
   var destroy = storage.destroy;
   var decorator = this;
   storage.destroy = function() {
     storage.destroy = destroy;
+    delete storage.__lsEventsDecorator;
     support.off(support.storageEventTarget, 'storage', decorator._onStorage);
     if (typeof destroy === 'function') {
       return destroy.apply(storage, arguments);
@@ -101,25 +105,15 @@ LocalStorageEventNormalizer.prototype = {
 };
 
 // Decorate a LocalStorage interface to properly trigger "storage" events in IE.
-var LSEvents = function(storage, onStorage, cookieName) {
-
-  // `storage` interface is optional
-  if (typeof storage === 'function') {
-    cookieName = onStorage;
-    onStorage = storage;
-    storage = LSWrapper;
-  }
-
-  // Sensible defaults for no args passed
-  if (typeof storage === 'undefined') {
-    storage = LSWrapper;
+var LSEvents = function(onStorage, options) {
+  // onStorage is optional
+  if (typeof onStorage !== 'function') {
+    options = onStorage;
     onStorage = function(){};
   }
-
-  // Default value for cookieName
-  if (typeof cookieName !== 'string') {
-    cookieName = 'lsevents-version';
-  }
+  options || (options = {});
+  var storage = options.storage || LSWrapper;
+  var cookieName = options.cookieName || 'lsevents-version';
 
   if (support.myWritesTrigger) {
     return new LocalStorageEventNormalizer(storage, onStorage, cookieName);

@@ -4,6 +4,7 @@ var Exec = require('iframe-transport/library/services/exec');
 var LSEvents = require('../localstorage-events');
 var LSWrapper = require('../util/ls-wrapper');
 var LSInterface = require('./ls-interface');
+var support = require('../util/support');
 
 describe('LSEvents', function() {
 
@@ -53,31 +54,60 @@ describe('LSEvents', function() {
   });
 
   it('can wrap a #get, #set, #unset localStorage interface', function(done) {
-    store = LSEvents(LSWrapper, function(evt) {
+    store = LSEvents(function(evt) {
       expect(evt.key).to.be('baz');
       expect(evt.oldValue).to.be(null);
       expect(evt.newValue).to.be('test');
       done();
-    });
+    }, { storage: LSWrapper });
 
     exec.code(function(exec, LSEvents, LSWrapper, LSInterface) {
-      var store = LSEvents(LSWrapper);
+      var store = LSEvents({ storage: LSWrapper });
       store.set('baz', 'test');
     });
   });
 
   it('can wrap a #get, #set, #unset localStorage interface with #serialize/#deserialize', function(done) {
-    store = LSEvents(LSInterface, function(evt) {
+    store = LSEvents(function(evt) {
       expect(evt.key).to.be('baz');
       expect(store.deserialize(evt.oldValue)).to.be(null);
       expect(store.deserialize(evt.newValue)).to.be('test');
       done();
-    });
+    }, { storage: LSInterface });
 
     exec.code(function(exec, LSEvents, LSInterface) {
-      var store = LSEvents(LSInterface);
+      var store = LSEvents({ storage: LSInterface });
       store.set('baz', 'test');
     });
+  });
+
+  it('juggles arguments: onStorage callback only', function() {
+    var onStorage = sinon.stub();
+    store = LSEvents(onStorage);
+    expect(store.__lsEventsDecorator.onStorage).to.equal(onStorage);
+  });
+
+  it('juggles arguments: options only', function() {
+    store = LSEvents({
+      storage: LSWrapper,
+      cookieName: 'my-cookie'
+    });
+    expect(store).to.equal(LSWrapper);
+    if (support.myWritesTrigger) {
+      expect(store.__lsEventsDecorator.cookieName).to.be('my-cookie');
+    }
+  });
+
+  it('juggles arguments: both onStorage callback and options', function() {
+    var onStorage = sinon.stub();
+    store = LSEvents(onStorage, {
+      storage: LSWrapper,
+      cookieName: 'test-cookie'
+    });
+    expect(store).to.equal(LSWrapper);
+    if (support.myWritesTrigger) {
+      expect(store.__lsEventsDecorator.cookieName).to.be('test-cookie');
+    }
   });
 
 });
