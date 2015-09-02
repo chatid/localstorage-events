@@ -28,6 +28,7 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-sinon": "^1.0.4",
     "karma-webpack": "^1.7.0",
+    "mocha": "git://github.com/mponizil/mocha#ie8-reduce",
     "sinon": "^1.16.1",
     "webpack": "^1.8.10"
   }
