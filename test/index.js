@@ -43,7 +43,6 @@ describe('LSEvents', function() {
   it('calls onStorage callback on "storage" events', function(done) {
     store = LSEvents(function(evt) {
       expect(evt.key).to.be('foo');
-      expect(evt.oldValue).to.be(null);
       expect(evt.newValue).to.be('bar');
       done();
     });
@@ -56,7 +55,6 @@ describe('LSEvents', function() {
   it('can wrap a #get, #set, #unset localStorage interface', function(done) {
     store = LSEvents(function(evt) {
       expect(evt.key).to.be('baz');
-      expect(evt.oldValue).to.be(null);
       expect(evt.newValue).to.be('test');
       done();
     }, {
@@ -74,7 +72,6 @@ describe('LSEvents', function() {
   it('can wrap a #get, #set, #unset localStorage interface with #serialize/#deserialize', function(done) {
     store = LSEvents(function(evt) {
       expect(evt.key).to.be('baz');
-      expect(store.deserialize(evt.oldValue)).to.be(null);
       expect(store.deserialize(evt.newValue)).to.be('test');
       done();
     }, {
