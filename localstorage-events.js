@@ -14,29 +14,24 @@ var support = require('./util/support');
 var instanceId = Math.floor(Math.random() * 1000) + '' + +new Date;
 
 function LocalStorageEventListener(storage, onStorage) {
-  this.storage = storage;
+  var destroy = storage.destroy;
+  var decorator = this;
+  storage.destroy = function() {
+    storage.destroy = destroy;
+    support.off(support.storageEventTarget, 'storage', decorator._onStorage);
+    if (typeof destroy === 'function') {
+      return destroy.apply(storage, arguments);
+    }
+  }
+
   this.onStorage = onStorage;
   this._onStorage = bind(this._onStorage, this);
   support.on(support.storageEventTarget, 'storage', this._onStorage);
+
+  return storage;
 }
 
 LocalStorageEventListener.prototype = {
-
-  get: function() {
-    return this.storage.get.apply(this, arguments);
-  },
-
-  set: function() {
-    return this.storage.set.apply(this, arguments);
-  },
-
-  unset: function() {
-    return this.storage.unset.apply(this, arguments);
-  },
-
-  destroy: function() {
-    support.off(support.storageEventTarget, 'storage', this._onStorage);
-  },
 
   _onStorage: function(evt) {
     this.onStorage(evt);
@@ -45,29 +40,26 @@ LocalStorageEventListener.prototype = {
 };
 
 function LocalStorageEventNormalizer(storage, onStorage) {
-  LocalStorageEventListener.apply(this, arguments);
+  var set = storage.set;
+  var destroy = storage.destroy;
+  storage.set = function(key) {
+    // Before setting the value, set a version flag indicating that the
+    // last write came from this window and targeted the given key.
+    Cookies.set('version', instanceId + ':' + key);
+    return set.apply(storage, arguments);
+  }
+  storage.destroy = function() {
+    storage.set = set;
+    storage.destroy = destroy;
+    if (typeof destroy === 'function') {
+      return destroy.apply(storage, arguments);
+    }
+  }
+
+  return LocalStorageEventListener.apply(this, arguments);
 }
 
 LocalStorageEventNormalizer.prototype = {
-
-  get: function(key) {
-    return this.storage.get.apply(this, arguments);
-  },
-
-  // Before setting the value, set a version flag indicating that the last write came
-  // from this window and targeted the given key.
-  set: function(key) {
-    Cookies.set('version', instanceId + ':' + key);
-    return this.storage.set.apply(this, arguments);
-  },
-
-  unset: function(key) {
-    return this.storage.unset.apply(this, arguments);
-  },
-
-  destroy: function() {
-    support.off(support.storageEventTarget, 'storage', this._onStorage);
-  },
 
   _onStorage: function(evt) {
     // IE8: to accurately determine `evt.newValue`, we must read it during the event

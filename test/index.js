@@ -2,7 +2,8 @@ var expect = require('expect.js');
 var ift = require('iframe-transport');
 var Exec = require('iframe-transport/library/services/exec');
 var LSEvents = require('../localstorage-events');
-var lsWrapper = require('../util/ls-wrapper');
+var LSWrapper = require('../util/ls-wrapper');
+var LSInterface = require('./ls-interface');
 
 describe('LSEvents', function() {
 
@@ -48,6 +49,34 @@ describe('LSEvents', function() {
     exec.code(function(exec, LSEvents) {
       var store = LSEvents();
       store.set('foo', 'bar');
+    });
+  });
+
+  it('can wrap a #get, #set, #unset localStorage interface', function(done) {
+    store = LSEvents(LSWrapper, function(evt) {
+      expect(evt.key).to.be('baz');
+      expect(evt.oldValue).to.be(null);
+      expect(evt.newValue).to.be('test');
+      done();
+    });
+
+    exec.code(function(exec, LSEvents, LSWrapper, LSInterface) {
+      var store = LSEvents(LSWrapper);
+      store.set('baz', 'test');
+    });
+  });
+
+  it('can wrap a #get, #set, #unset localStorage interface with #serialize/#deserialize', function(done) {
+    store = LSEvents(LSInterface, function(evt) {
+      expect(evt.key).to.be('baz');
+      expect(store.deserialize(evt.oldValue)).to.be(null);
+      expect(store.deserialize(evt.newValue)).to.be('test');
+      done();
+    });
+
+    exec.code(function(exec, LSEvents, LSInterface) {
+      var store = LSEvents(LSInterface);
+      store.set('baz', 'test');
     });
   });
 
