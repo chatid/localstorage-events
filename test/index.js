@@ -5,7 +5,10 @@ var LSEvents = require('../localstorage-events');
 var LSWrapper = require('../util/ls-wrapper');
 var LSInterface = require('./ls-interface');
 var support = require('../util/support');
-var TICK = 17;
+
+// "storage" events are fired async and with inconsistent timing
+// Use 30ms to be safe
+var TICK = 30;
 
 describe('LSEvents', function() {
 
@@ -26,8 +29,7 @@ describe('LSEvents', function() {
     exec.code(function() {
       localStorage.clear();
     }, function() {
-      // Prevent cleanup "storage" events from interfering with real tests (it seems that "storage"
-      // events are dispatched async, so calling `done` from this callback is not sufficient)
+      // Prevent cleanup "storage" events from interfering with real tests
       setTimeout(done, TICK);
     });
   });
@@ -122,6 +124,32 @@ describe('LSEvents', function() {
     setTimeout(function() {
       sinon.assert.notCalled(onStorage);
       done();
+    }, TICK);
+  });
+
+  it('supports keys containing ":"', function(done) {
+    var onStorage = sinon.stub();
+    store = LSEvents(onStorage);
+
+    store.set('beep:boop', 'test1');
+    setTimeout(function() {
+
+      sinon.assert.notCalled(onStorage);
+
+      exec.code(function(exec, LSEvents) {
+        var store = LSEvents();
+        store.set('boop:beep', 'test2');
+      }, function() {
+        setTimeout(function() {
+          sinon.assert.calledOnce(onStorage);
+          sinon.assert.calledWithMatch(onStorage, {
+            key: 'boop:beep',
+            newValue: 'test2'
+          });
+          done();
+        }, TICK);
+      });
+
     }, TICK);
   });
 

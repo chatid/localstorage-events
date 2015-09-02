@@ -85,8 +85,10 @@ LocalStorageEventNormalizer.prototype = {
   // Ignore the event if it originated in this window. Tell IE8 which `key` changed
   // and grab it's `newValue`.
   _processStorageEvt: function(evt) {
-    var ref = (Cookies.get(this.cookieName) || ':').split(':'),
-        writerId = ref[0], key = ref[1];
+    var version = Cookies.get(this.cookieName) || ':',
+        index = version.indexOf(':'),
+        writerId = version.substring(0, index),
+        key = version.substring(index + 1);
 
     // For all IE
     if (writerId == instanceId) return;
