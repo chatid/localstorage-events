@@ -128,12 +128,14 @@ LocalStorageEventNormalizer.prototype = {
 
 // Decorate a LocalStorage interface to properly trigger "storage" events in IE.
 var LSEvents = function(onStorage, options) {
+
   // onStorage is optional
   if (typeof onStorage !== 'function') {
     options = onStorage;
     onStorage = function(){};
   }
   options || (options = {});
+
   var storage = options.storage || LSWrapper;
   var cookieName = options.cookieName || 'lsevents-version';
   var cookieDomain = options.cookieDomain || getDomain();
