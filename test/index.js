@@ -158,4 +158,38 @@ describe('LSEvents', function() {
     }, TICK);
   });
 
+  it('prevents double "storage" events for single keys', function(done) {
+    exec.code(function(exec, LSEvents) {
+      var store = LSEvents();
+      store.set('foo1', 'oldValue');
+      store.set('foo2', 'oldValue');
+      store.destroy();
+    }, function() {
+      setTimeout(function() {
+        var onStorage = sinon.stub();
+        store = LSEvents(onStorage);
+
+        exec.code(function(exec, LSEvents) {
+          var store = LSEvents();
+          store.set('foo1', 'newValue');
+          store.set('foo2', 'newValue');
+          store.destroy();
+        }, function() {
+          setTimeout(function() {
+            sinon.assert.calledTwice(onStorage);
+            // [fixme] Don't check for matching `key` because IE8 thinks they're both foo2
+            expect(onStorage.firstCall.calledWithMatch({
+              newValue: 'newValue'
+            })).to.be(true);
+            sinon.assert.calledTwice(onStorage);
+            expect(onStorage.secondCall.calledWithMatch({
+              newValue: 'newValue'
+            })).to.be(true);
+            done();
+          }, TICK);
+        });
+      }, TICK);
+    });
+  });
+
 });

@@ -47,6 +47,12 @@ LocalStorageEventListener.prototype = {
 function LocalStorageEventNormalizer(storage, onStorage, cookieName) {
   this.cookieName = cookieName;
 
+  // IE11
+  if (support.storageEventCanTriggerTwice) {
+    this._oldValues = {};
+    this._newValues = {};
+  }
+
   var set = storage.set;
   var destroy = storage.destroy;
   storage.set = function(key) {
@@ -97,9 +103,11 @@ LocalStorageEventNormalizer.prototype = {
     // http://stackoverflow.com/questions/20565508/how-to-work-around-ie11-localstorage-events-firing-twice-or-not-at-all-in-iframe
     // https://connect.microsoft.com/IE/feedback/details/811546/ie11-localstorage-events-fire-twice-or-not-at-all-in-iframes
     if (support.storageEventCanTriggerTwice) {
-      if (evt.oldValue === this._lastOldValue && evt.newValue === this._lastNewValue) return;
-      this._lastOldValue = evt.oldValue;
-      this._lastNewValue = evt.newValue;
+      if (evt.oldValue === this._oldValues[evt.key] && evt.newValue === this._newValues[evt.key]) {
+        return;
+      }
+      this._oldValues[evt.key] = evt.oldValue;
+      this._newValues[evt.key] = evt.newValue;
     }
 
     // For IE8
