@@ -93,6 +93,15 @@ LocalStorageEventNormalizer.prototype = {
     // For all IE
     if (writerId == instanceId) return;
 
+    // IE11 events can get sent twice when there's an iframe involved
+    // http://stackoverflow.com/questions/20565508/how-to-work-around-ie11-localstorage-events-firing-twice-or-not-at-all-in-iframe
+    // https://connect.microsoft.com/IE/feedback/details/811546/ie11-localstorage-events-fire-twice-or-not-at-all-in-iframes
+    if (support.storageEventCanTriggerTwice) {
+      if (evt.oldValue === this._lastOldValue && evt.newValue === this._lastNewValue) return;
+      this._lastOldValue = evt.oldValue;
+      this._lastNewValue = evt.newValue;
+    }
+
     // For IE8
     if (!support.storageEventProvidesKey) {
       evt = {

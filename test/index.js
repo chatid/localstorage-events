@@ -8,7 +8,7 @@ var support = require('../source/util/support');
 
 // "storage" events are fired async and with inconsistent timing
 // IE9 is super prone to race conditions, so just use 100ms for IE
-var TICK = navigator.userAgent.indexOf('MSIE') >= 0 ? 100 : 17;
+var TICK = navigator.userAgent.indexOf('Trident') >= 0 ? 100 : 17;
 
 describe('LSEvents', function() {
 
