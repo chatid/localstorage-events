@@ -4,10 +4,10 @@ module.exports = {
   // `Error: a dependency to an entry point is not allowed`
   // https://github.com/webpack/webpack/issues/300
   entry: {
-    'localstorage-events': ['./localstorage-events'],
+    'localstorage-events': ['./source/localstorage-events'],
   },
   output: {
-    path: __dirname + '/dist',
+    path: __dirname,
     filename: 'localstorage-events.js',
     library: 'LSEvents',
     libraryTarget: 'umd'

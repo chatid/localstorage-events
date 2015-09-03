@@ -1,10 +1,10 @@
 var expect = require('expect.js');
 var ift = require('iframe-transport');
 var Exec = require('iframe-transport/library/services/exec');
-var LSEvents = require('../localstorage-events');
-var LSWrapper = require('../util/ls-wrapper');
+var LSEvents = require('../source/localstorage-events');
+var LSWrapper = require('../source/util/ls-wrapper');
 var LSInterface = require('./ls-interface');
-var support = require('../util/support');
+var support = require('../source/util/support');
 
 // "storage" events are fired async and with inconsistent timing
 // IE9 is super prone to race conditions, so just use 100ms for IE
