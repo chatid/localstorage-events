@@ -2,7 +2,7 @@
   "name": "localstorage-events",
   "version": "0.0.1",
   "description": "Thin wrapper for LocalStorage to make \"storage\" events in IE8+ consistent with modern browsers",
-  "main": "localstorage-events.js",
+  "main": "./source/localstorage-events.js",
   "scripts": {
     "test": "karma start --single-run",
     "test-sauce": "karma start karma-sauce.conf.js"
