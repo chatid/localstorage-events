@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "iframe-transport": "git://github.com/chatid/iframe-transport",
+    "iframe-transport": "git://github.com/chatid/iframe-transport#destroy",
     "karma": "^0.13.3",
     "karma-cli": "0.0.4",
     "karma-mocha": "^0.1.10",

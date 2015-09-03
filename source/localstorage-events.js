@@ -10,6 +10,7 @@ var assign = require('./util/assign');
 var bind = require('./util/bind');
 var LSWrapper = require('./util/ls-wrapper');
 var support = require('./util/support');
+var getDomain = require('./util/get-domain');
 
 var instanceId = Math.floor(Math.random() * 1000) + '' + +new Date;
 
@@ -44,7 +45,7 @@ LocalStorageEventListener.prototype = {
 
 };
 
-function LocalStorageEventNormalizer(storage, onStorage, cookieName) {
+function LocalStorageEventNormalizer(storage, onStorage, cookieName, cookieDomain) {
   this.cookieName = cookieName;
 
   // IE11
@@ -58,7 +59,9 @@ function LocalStorageEventNormalizer(storage, onStorage, cookieName) {
   storage.set = function(key) {
     // Before setting the value, set a version flag indicating that the
     // last write came from this window and targeted the given key.
-    Cookies.set(cookieName, instanceId + ':' + key);
+    Cookies.set(cookieName, instanceId + ':' + key, {
+      domain: cookieDomain
+    });
     return set.apply(storage, arguments);
   }
   storage.destroy = function() {
@@ -133,9 +136,10 @@ var LSEvents = function(onStorage, options) {
   options || (options = {});
   var storage = options.storage || LSWrapper;
   var cookieName = options.cookieName || 'lsevents-version';
+  var cookieDomain = options.cookieDomain || getDomain();
 
   if (support.myWritesTrigger) {
-    return new LocalStorageEventNormalizer(storage, onStorage, cookieName);
+    return new LocalStorageEventNormalizer(storage, onStorage, cookieName, cookieDomain);
   } else {
     return new LocalStorageEventListener(storage, onStorage);
   }

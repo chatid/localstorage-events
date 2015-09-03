@@ -1,6 +1,7 @@
 var expect = require('expect.js');
 var ift = require('iframe-transport');
 var Exec = require('iframe-transport/library/services/exec');
+var Cookies = require('js-cookie');
 var LSEvents = require('../source/localstorage-events');
 var LSWrapper = require('../source/util/ls-wrapper');
 var LSInterface = require('./ls-interface');
@@ -189,6 +190,41 @@ describe('LSEvents', function() {
           }, TICK);
         });
       }, TICK);
+    });
+  });
+
+});
+
+xdescribe('LSEvents - extras', function() {
+
+  // Add the following to /etc/hosts to run this test from sub1.localstorage-events.dev
+  //
+  //   127.0.0.1 sub1.localstorage-events.dev
+  //   127.0.0.1 sub2.localstorage-events.dev
+  //
+  // Run tests with HOST=sub1.localstorage-events.dev
+  it('saves cookies without sub-domain', function(done) {
+    if (!support.myWritesTrigger) {
+      return done();
+    }
+
+    var manager = ift.parent({
+      childOrigin: 'http://sub2.localstorage-events.dev:' + __PORT__,
+      childPath: '/base/test/child.html'
+    });
+    manager.ready(function() {
+      exec = manager.service('exec', Exec);
+      exec.code(function(exec, LSEvents) {
+        var store = LSEvents({
+          cookieName: 'test'
+        });
+        store.set('foo', 'bar');
+      }, function() {
+        var cookie = Cookies.get('test');
+        var key = cookie.substring(cookie.indexOf(':') + 1);
+        expect(key).to.be('foo');
+        done();
+      });
     });
   });
 
