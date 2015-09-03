@@ -16,6 +16,6 @@ var support = module.exports = {
   },
   myWritesTrigger: ('onstoragecommit' in document),
   storageEventCanTriggerTwice: (navigator.userAgent.indexOf('Trident/7.0') >= 0),
-  storageEventTarget: ('onstorage' in window ? window : document),
+  storageEventTarget: ('onstorage' in document ? document : window),
   storageEventProvidesKey: !('onstorage' in document)
 };
