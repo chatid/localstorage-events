@@ -52,6 +52,7 @@ describe('LSEvents', function() {
     exec.code(function(exec, LSEvents) {
       var store = LSEvents();
       store.set('foo', 'bar');
+      store.destroy();
     });
   });
 
@@ -69,6 +70,7 @@ describe('LSEvents', function() {
         storage: LSWrapper
       });
       store.set('baz', 'test');
+      store.destroy();
     });
   });
 
@@ -86,6 +88,7 @@ describe('LSEvents', function() {
         storage: LSInterface
       });
       store.set('baz', 'test');
+      store.destroy();
     });
   });
 
@@ -140,6 +143,7 @@ describe('LSEvents', function() {
       exec.code(function(exec, LSEvents) {
         var store = LSEvents();
         store.set('boop:beep', 'test2');
+        store.destroy();
       }, function() {
         setTimeout(function() {
           sinon.assert.calledOnce(onStorage);
