@@ -17,6 +17,7 @@ describe('LSEvents', function() {
 
   beforeEach(function(done) {
     localStorage.clear();
+    // Prevent cleanup "storage" events from interfering with real tests
     setTimeout(done, TICK);
   });
 
