@@ -22,7 +22,8 @@ describe('LSEvents', function() {
   });
 
   afterEach(function() {
-    store && store.destroy();
+    // `store` can be any storage interface and may not have a #destroy
+    if (store && store.destroy) store.destroy();
   });
 
   describe('core', function() {
